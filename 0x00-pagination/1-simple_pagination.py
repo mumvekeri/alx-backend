@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """ task 1 answer """
-
 import csv
 import math
 from typing import List
