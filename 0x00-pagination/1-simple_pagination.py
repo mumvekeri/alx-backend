@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """ task 1 answer """
 
-
 import csv
 import math
 from typing import List
+
 
 def index_range(page: int, page_size: int) -> tuple:
     """
