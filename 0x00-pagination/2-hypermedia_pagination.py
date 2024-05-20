@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-""" Task 2: Implementing Pagination """
+"""
+Task 2: Implementing Pagination
+"""
 import csv
 import math
 from typing import List, Tuple, Dict, Any
@@ -18,11 +20,12 @@ def index_range(page: int, page_size: int) -> Tuple[int, int]:
     """
     start_index = (page - 1) * page_size
     end_index = start_index + page_size
-    return (start_index, end_index)
+    return start_index, end_index
 
 
 class Server:
-    """Server class to paginate a database of popular baby names.
+    """
+    Server class to paginate a database of popular baby names.
     """
     DATA_FILE = "Popular_Baby_Names.csv"
 
@@ -30,7 +33,12 @@ class Server:
         self.__dataset = None
 
     def dataset(self) -> List[List]:
-        """Cached dataset"""
+        """
+        Cached dataset.
+
+        Returns:
+            List[List]: The cached dataset.
+        """
         if self.__dataset is None:
             with open(self.DATA_FILE) as f:
                 reader = csv.reader(f)
@@ -41,15 +49,19 @@ class Server:
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-        Takes 2 integer arguments and returns requested page from the dataset
+        Retrieve a page from the dataset.
+
         Args:
-            page (int): required page number. must be a positive integer
-            page_size (int): number of records per page. must be a positive integer
-        Return:
-            list of lists containing required data from the dataset
+            page (int): The required page number. Must be a positive integer.
+            page_size (int): The number of records per page. Must be a positive 
+            integer.
+
+        Returns:
+            List[List]: A list of rows from the dataset corresponding to the 
+            given page.
         """
-        assert type(page) is int and page > 0
-        assert type(page_size) is int and page_size > 0
+        assert isinstance(page, int) and page > 0,
+        assert isinstance(page_size, int) and page_size > 0,
 
         dataset = self.dataset()
         start_index, end_index = index_range(page, page_size)
@@ -61,15 +73,19 @@ class Server:
 
     def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict[str, Any]:
         """
-        Takes 2 integer arguments and returns a dictionary with pagination info.
+        Retrieve pagination metadata and a page from the dataset.
+
         Args:
-            page (int): required page number. must be a positive integer
-            page_size (int): number of records per page. must be a positive integer
-        Return:
-            dictionary containing pagination data
+            page (int): The required page number. Must be a positive integer.
+            page_size (int): The number of records per page. Must be a positive 
+            integer.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing pagination metadata and 
+            the page data.
         """
-        assert type(page) is int and page > 0
-        assert type(page_size) is int and page_size > 0
+        assert isinstance(page, int) and page > 0,
+        assert isinstance(page_size, int) and page_size > 0,
 
         data = self.get_page(page, page_size)
         total_items = len(self.dataset())
