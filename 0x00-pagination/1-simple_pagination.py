@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """ task 1 answer """
 import csv
-import math
-from typing import List
+from typing import List, Tuple
 
 
-def index_range(page: int, page_size: int) -> tuple:
+def index_range(page: int, page_size: int) -> Tuple[int, int]:
     """
     Calculate start and end indexes for pagination.
 
@@ -14,11 +13,11 @@ def index_range(page: int, page_size: int) -> tuple:
     page_size (int): The number of items per page.
 
     Returns:
-    tuple: A tuple containing the start index and the end index.
+    Tuple[int, int]: A tuple containing the start index and the end index.
     """
     start_index = (page - 1) * page_size
     end_index = start_index + page_size
-    return (start_index, end_index)
+    return start_index, end_index
 
 class Server:
     """Server class to paginate a database of popular baby names.
@@ -41,20 +40,23 @@ class Server:
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
         """
-        Takes 2 integer arguments and returns requested page from the dataset
+        Takes 2 integer arguments and returns the requested page from the dataset.
+        
         Args:
-            page (int): required page number. must be a positive integer
-            page_size (int): number of records per page. must be a +ve integer
-        Return:
-            list of lists containing required data from the dataset
+            page (int): The required page number. Must be a positive integer.
+            page_size (int): The number of records per page. Must be a positive integer.
+        
+        Returns:
+            List[List]: A list of lists containing the required data from the dataset.
         """
-        assert type(page) is int and page > 0
-        assert type(page_size) is int and page_size > 0
+        assert isinstance(page, int) and page > 0,
+        assert isinstance(page_size, int) and page_size > 0,
 
         dataset = self.dataset()
-        data_length = len(dataset)
-        try:
-            index = index_range(page, page_size)
-            return dataset[index[0]:index[1]]
-        except IndexError:
+        start_index, end_index = index_range(page, page_size)
+        
+        # Handle the case where the start index is beyond the dataset length
+        if start_index >= len(dataset):
             return []
+        
+        return dataset[start_index:end_index]
