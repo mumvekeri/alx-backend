@@ -1,64 +1,66 @@
 #!/usr/bin/env python3
-""" LFUCache module """
+""" BaseCaching module
+"""
 from base_caching import BaseCaching
-from collections import defaultdict, OrderedDict
 
 
 class LFUCache(BaseCaching):
-    """ LFUCache class inherits from BaseCaching and implements an LFU
-        caching system with LRU tie-breaking.
+    """
+    FIFOCache defines a FIFO caching system
     """
 
     def __init__(self):
-        """ Initialize the cache """
+        """
+        Initialize the class with the parent's init method
+        """
         super().__init__()
-        self.freq = defaultdict(int)
-        self.order = OrderedDict()
+        self.usage = []
+        self.frequency = {}
 
     def put(self, key, item):
-        """ Add an item in the cache
-            If key or item is None, this method should not do anything.
-            If the cache exceeds MAX_ITEMS, discard the least frequently used item.
-            If there is a tie, discard the least recently used item.
+        """
+        Cache a key-value pair
         """
         if key is None or item is None:
-            return
-
-        if key in self.cache_data:
-            self.freq[key] += 1
-            self.order.move_to_end(key)
+            pass
         else:
-            if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                # Find the least frequently used key
-                lfu_key = min(self.freq, key=lambda k: (self.freq[k], self.order[k]))
-                self.order.pop(lfu_key)
-                self.freq.pop(lfu_key)
-                self.cache_data.pop(lfu_key)
-                print(f"DISCARD: {lfu_key}")
+            length = len(self.cache_data)
+            if length >= BaseCaching.MAX_ITEMS and key not in self.cache_data:
+                lfu = min(self.frequency.values())
+                lfu_keys = []
+                for k, v in self.frequency.items():
+                    if v == lfu:
+                        lfu_keys.append(k)
+                if len(lfu_keys) > 1:
+                    lru_lfu = {}
+                    for k in lfu_keys:
+                        lru_lfu[k] = self.usage.index(k)
+                    discard = min(lru_lfu.values())
+                    discard = self.usage[discard]
+                else:
+                    discard = lfu_keys[0]
 
+                print("DISCARD: {}".format(discard))
+                del self.cache_data[discard]
+                del self.usage[self.usage.index(discard)]
+                del self.frequency[discard]
+            # update usage frequency
+            if key in self.frequency:
+                self.frequency[key] += 1
+            else:
+                self.frequency[key] = 1
+            if key in self.usage:
+                del self.usage[self.usage.index(key)]
+            self.usage.append(key)
             self.cache_data[key] = item
-            self.freq[key] = 1
-            self.order[key] = None
 
     def get(self, key):
-        """ Get an item by key
-            Return the value in self.cache_data linked to key.
-            If key is None or if the key doesn’t exist in self.cache_data,
-            return None.
         """
-        if key is None or key not in self.cache_data:
-            return None
-        self.freq[key] += 1
-        self.order.move_to_end(key)
-        return self.cache_data[key]
-
-
-class BaseCaching:
-    """ BaseCaching defines:
-      - A class constructor that initializes the cache_data dictionary
-    """
-    MAX_ITEMS = 4
-
-    def __init__(self):
-        """ Initialize the cache """
-        self.cache_data = {}
+        Return the value linked to a given key, or None
+        """
+        if key is not None and key in self.cache_data.keys():
+            del self.usage[self.usage.index(key)]
+            self.usage.append(key)
+            self.frequency[key] += 1
+            return self.cache_data[key]
+        return None
